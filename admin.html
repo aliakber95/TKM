@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header-image">
+    <img src="C:\Users\FUJITSU\Downloads\unnamed.png" alt="Header Image" class="top-center-image">
+  </div>
+  <div class="container">
+    <h1>Admin Panel</h1>
+    <h2>Create User</h2>
+    <input type="text" id="newUsername" placeholder="New Username">
+    <input type="password" id="newPassword" placeholder="New Password">
+    <button id="createUserBtn">Create User</button>
+    <p id="userMessage" class="success"></p>
+
+    <h2>Existing Users</h2>
+    <ul id="userList"></ul>
+    
+    <!-- Home Button -->
+    <button id="homeBtn">Home</button>
+  </div>
+
+  <script>
+    const currentUser = localStorage.getItem('currentUser');
+    
+    // Check if the user is not admin, redirect them to the login page
+    if (currentUser !== 'admin') {
+      alert('Unauthorized access. Redirecting to login.');
+      window.location.href = 'index.html';
+    }
+
+    // Retrieve existing users from local storage
+    const users = JSON.parse(localStorage.getItem('users')) || [{ username: 'admin', password: 'admin' }];
+
+    const renderUsers = () => {
+      const userList = document.getElementById('userList');
+      userList.innerHTML = '';
+
+      users.forEach((user, index) => {
+        const li = document.createElement('li');
+        li.textContent = user.username === 'admin' ? `${user.username} (Admin)` : user.username;
+        if (user.username !== 'admin') {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.style.marginLeft = '10px';
+          deleteBtn.addEventListener('click', () => {
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            renderUsers();
+          });
+          li.appendChild(deleteBtn);
+        }
+        userList.appendChild(li);
+      });
+    };
+
+    document.getElementById('createUserBtn').addEventListener('click', () => {
+      const username = document.getElementById('newUsername').value.trim();
+      const password = document.getElementById('newPassword').value.trim();
+
+      if (!username || !password) {
+        alert('Username and password are required!');
+        return;
+      }
+
+      if (users.some(u => u.username === username)) {
+        alert('Username already exists!');
+        return;
+      }
+
+      users.push({ username, password });
+      localStorage.setItem('users', JSON.stringify(users));
+      document.getElementById('userMessage').textContent = 'User created successfully!';
+      renderUsers();
+    });
+
+    document.getElementById('homeBtn').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    renderUsers();
+  </script>
+</body>
+</html>

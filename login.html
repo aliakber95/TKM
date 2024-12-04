@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header-image">
+    <img src="C:\Users\FUJITSU\Downloads\unnamed.png" alt="Header Image" class="top-center-image">
+  </div>
+  <div class="container">
+    <h1>Login</h1>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
+    <p id="errorMessage" class="error"></p>
+  </div>
+
+  <script>
+    const users = JSON.parse(localStorage.getItem('users')) || [{ username: 'admin', password: 'admin' }];
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        localStorage.setItem('currentUser', username);
+        window.location.href = 'upload.html';
+      } else {
+        document.getElementById('errorMessage').textContent = 'Invalid username or password!';
+      }
+    });
+  </script>
+</body>
+</html>

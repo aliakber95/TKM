@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Member List</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header-image">
+    <img src="C:\Users\FUJITSU\Downloads\unnamed.png" alt="Header Image" class="top-center-image">
+  </div>
+  <div class="container">
+    <h1>Upload Member List</h1>
+    <label for="fileInput" id="fileLabel" class="button">Choose a CSV File</label>
+    <input type="file" id="fileInput" accept=".csv">
+    <button id="proceedBtn" disabled>Proceed to Mark Attendance</button>
+  </div>
+  
+  <script>
+    let members = [];
+
+    const fileInput = document.getElementById('fileInput');
+    const proceedBtn = document.getElementById('proceedBtn');
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target.result;
+          const rows = content.split('\n').map(row => row.trim());
+          members = rows
+            .filter(row => row)
+            .map(row => {
+              const [its, name] = row.split(',');
+              return its && name ? { its: its.trim(), name: name.trim() } : null;
+            })
+            .filter(Boolean);
+
+          if (members.length > 0) {
+            alert("Member list uploaded successfully!");
+            localStorage.setItem('members', JSON.stringify(members));
+            proceedBtn.disabled = false;
+          } else {
+            alert("Invalid or empty file. Please upload a valid CSV file.");
+          }
+        };
+        reader.readAsText(file);
+      } else {
+        alert("No file selected. Please choose a CSV file.");
+      }
+    });
+
+    proceedBtn.addEventListener('click', () => {
+      window.location.href = "attendance.html";
+    });
+  </script>
+</body>
+</html>

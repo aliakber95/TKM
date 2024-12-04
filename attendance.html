@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mark Attendance</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header-image">
+    <img src="C:\Users\FUJITSU\Downloads\unnamed.png" alt="Header Image" class="top-center-image">
+  </div>
+  <div class="container">
+    <h1>Mark Attendance</h1>
+    <input type="text" id="itsInput" placeholder="Enter ITS Number">
+    <div class="button-container">
+      <button id="markAttendanceBtn">Mark Attendance</button>
+      <button id="outOfCountryBtn">Out of Country</button>
+    </div>
+    <table id="attendanceTable">
+      <thead>
+        <tr>
+          <th>ITS Number</th>
+          <th>Member Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <button id="exportBtn" class="export-button">Export Attendance</button>
+  </div>
+  
+  <script>
+    let members = JSON.parse(localStorage.getItem('members')) || [];
+    let attendance = new Map();
+
+    const tableBody = document.querySelector('#attendanceTable tbody');
+    const exportBtn = document.getElementById('exportBtn');
+
+    const renderTable = () => {
+      tableBody.innerHTML = '';
+      attendance.forEach((status, its) => {
+        const member = members.find(m => m.its === its);
+        if (member) {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${member.its}</td>
+            <td>${member.name}</td>
+            <td>${status}</td>
+          `;
+          tableBody.appendChild(row);
+        }
+      });
+    };
+
+    document.getElementById('markAttendanceBtn').addEventListener('click', () => {
+      const itsNumber = document.getElementById('itsInput').value.trim();
+      const member = members.find(m => m.its === itsNumber);
+      if (member) {
+        attendance.set(itsNumber, 'Marked');
+        alert(`Attendance marked for ${member.name}`);
+        renderTable();
+        document.getElementById('itsInput').value = '';
+      } else {
+        alert("Invalid ITS Number!");
+      }
+    });
+
+    document.getElementById('outOfCountryBtn').addEventListener('click', () => {
+      const itsNumber = document.getElementById('itsInput').value.trim();
+      const member = members.find(m => m.its === itsNumber);
+      if (member) {
+        attendance.set(itsNumber, 'Out of Country');
+        alert(`${member.name} marked as Out of Country`);
+        renderTable();
+        document.getElementById('itsInput').value = '';
+      } else {
+        alert("Invalid ITS Number!");
+      }
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const exportData = Array.from(attendance.entries()).map(([its, status]) => {
+        const member = members.find(m => m.its === its);
+        return member ? `${member.its},${member.name},${status}` : '';
+      }).filter(row => row);
+
+      const csvContent = "data:text/csv;charset=utf-8," + exportData.join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "attendance.csv");
+      document.body.appendChild(link); // Required for FF
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    renderTable();
+  </script>
+</body>
+</html>

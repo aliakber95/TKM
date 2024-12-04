@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="header-image">
+    <img src="C:\Users\FUJITSU\Downloads\unnamed.png" alt="Header Image" class="top-center-image">
+  </div>
+  <div class="container">
+    <h1>Welcome</h1>
+    <div class="input-container">
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+    </div>
+    <div class="button-container">
+      <button id="loginBtn">Login</button>
+      <button id="adminLoginBtn">Admin</button>
+    </div>
+    <p id="errorMessage" class="error"></p>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Admin Login</h2>
+      <input type="text" id="adminUsername" placeholder="Admin Username">
+      <input type="password" id="adminPassword" placeholder="Admin Password">
+      <button id="adminLoginConfirmBtn">Login as Admin</button>
+      <p id="adminErrorMessage" class="error"></p>
+    </div>
+  </div>
+
+  <script>
+    const users = JSON.parse(localStorage.getItem('users')) || [{ username: 'admin', password: 'admin' }];
+
+    // Regular User Login
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        localStorage.setItem('currentUser', username);
+        window.location.href = 'upload.html';
+      } else {
+        document.getElementById('errorMessage').textContent = 'Invalid username or password!';
+      }
+    });
+
+    // Admin Modal Logic
+    const adminModal = document.getElementById('adminModal');
+    const closeModal = document.querySelector('.close');
+
+    document.getElementById('adminLoginBtn').addEventListener('click', () => {
+      adminModal.style.display = 'block';
+    });
+
+    closeModal.addEventListener('click', () => {
+      adminModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', event => {
+      if (event.target === adminModal) {
+        adminModal.style.display = 'none';
+      }
+    });
+
+    // Admin Login Confirmation
+    document.getElementById('adminLoginConfirmBtn').addEventListener('click', () => {
+      const username = document.getElementById('adminUsername').value.trim();
+      const password = document.getElementById('adminPassword').value.trim();
+
+      if (username === 'admin' && password === 'admin') {
+        localStorage.setItem('currentUser', username);
+        window.location.href = 'admin.html';
+      } else {
+        document.getElementById('adminErrorMessage').textContent = 'Invalid admin credentials!';
+      }
+    });
+  </script>
+</body>
+</html>
